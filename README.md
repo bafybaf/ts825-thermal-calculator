@@ -57,9 +57,9 @@ CREATE DATABASE ts825_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 `api/config.php` dosyasında veritabanı ayarları zaten yapılandırılmış:
 ```php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'bonusyalitim_ts825');
-define('DB_USER', 'bonusyalitim_ts825');
-define('DB_PASS', 'ts825_2025');
+define('DB_NAME', '');
+define('DB_USER', '');
+define('DB_PASS', '');
 ```
 
 4. **Veritabanı Kurulumu**
