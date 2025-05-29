@@ -1,4 +1,4 @@
-# BONUS TS 825 Hesap Programı
+TS 825 Hesap Programı
 
 Web tabanlı TS 825:2024 Revizyonu esas alınarak geliştirilmiş enerji verimliliği hesap programı - Kullanıcı Üyelik Sistemi ile.
 
@@ -94,4 +94,4 @@ http://yoursite.com/login.html
 - XSS koruması
 - CSRF token sistemi (geliştiriliyor)
 
-Bu program İZODER TS 825 programına alternatif olarak geliştirilmiştir ve TS 825:2024 standartlarına uygun hesaplamalar yapar.
+Bu program TS 825 programına alternatif olarak geliştirilmiştir ve TS 825:2024 standartlarına uygun hesaplamalar yapar.
