@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TS 825 API Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>TS 825 API Test Sayfası</h1>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Testleri</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2 w-100" onclick="testLocalStorage()">LocalStorage Test</button>
+                        <button class="btn btn-success mb-2 w-100" onclick="createDemoData()">Demo Veriler Oluştur</button>
+                        <button class="btn btn-info mb-2 w-100" onclick="loadProjects()">Projeleri Yükle</button>
+                        <button class="btn btn-warning mb-2 w-100" onclick="createProject()">Yeni Proje Oluştur</button>
+                        <button class="btn btn-secondary mb-2 w-100" onclick="loadStats()">İstatistikleri Yükle</button>
+                        <button class="btn btn-danger mb-2 w-100" onclick="clearData()">Verileri Temizle</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Sonuçlar</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre id="results" style="max-height: 400px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px;"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.textContent += `[${timestamp}] ${message}\n`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testAPI() {
+            log('API testi başlatılıyor...');
+            try {
+                const response = await fetch('api/test.php');
+                const data = await response.json();
+                log('API Test Sonucu: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('API Test Hatası: ' + error.message);
+            }
+        }
+
+        async function createDemoData() {
+            log('Demo veriler oluşturuluyor...');
+            try {
+                const response = await fetch('api/simple-projects.php?action=create_demo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                log('Demo Veri Sonucu: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('Demo Veri Hatası: ' + error.message);
+            }
+        }
+
+        async function loadProjects() {
+            log('Projeler yükleniyor...');
+            try {
+                const response = await fetch('api/simple-projects.php?action=list');
+                const data = await response.json();
+                log('Projeler: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('Proje Yükleme Hatası: ' + error.message);
+            }
+        }
+
+        async function createProject() {
+            log('Yeni proje oluşturuluyor...');
+            try {
+                const projectData = {
+                    name: 'Test Projesi ' + Date.now(),
+                    description: 'Test açıklaması',
+                    building_type: 'residential',
+                    climate_zone: 3,
+                    total_area: 150.5
+                };
+
+                const response = await fetch('api/simple-projects.php?action=create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(projectData)
+                });
+                const data = await response.json();
+                log('Yeni Proje Sonucu: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('Proje Oluşturma Hatası: ' + error.message);
+            }
+        }
+
+        async function loadStats() {
+            log('İstatistikler yükleniyor...');
+            try {
+                const response = await fetch('api/simple-projects.php?action=stats');
+                const data = await response.json();
+                log('İstatistikler: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('İstatistik Yükleme Hatası: ' + error.message);
+            }
+        }
+
+        function testLocalStorage() {
+            log('LocalStorage testi başlatılıyor...');
+            try {
+                // Test verisi
+                const testData = { test: 'value', timestamp: Date.now() };
+
+                // Kaydet
+                localStorage.setItem('ts825_test', JSON.stringify(testData));
+
+                // Oku
+                const retrieved = JSON.parse(localStorage.getItem('ts825_test'));
+
+                if (retrieved && retrieved.test === 'value') {
+                    log('LocalStorage Test: BAŞARILI');
+                } else {
+                    log('LocalStorage Test: BAŞARISIZ - Veri okunamadı');
+                }
+
+                // Temizle
+                localStorage.removeItem('ts825_test');
+
+            } catch (error) {
+                log('LocalStorage Test Hatası: ' + error.message);
+            }
+        }
+
+        function clearData() {
+            log('Veriler temizleniyor...');
+            try {
+                // LocalStorage temizle
+                localStorage.clear();
+
+                // Test sonuçlarını temizle
+                document.getElementById('results').textContent = '';
+
+                log('Tüm veriler temizlendi.');
+            } catch (error) {
+                log('Veri temizleme hatası: ' + error.message);
+            }
+        }
+
+        // Sayfa yüklendiğinde API testini çalıştır
+        window.addEventListener('load', () => {
+            log('Test sayfası yüklendi. API testleri hazır.');
+        });
+    </script>
+</body>
+</html>

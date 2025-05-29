@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TS 825 Isı Geçirgenlik Hesaplayıcısı</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <style>
+        .layer-item {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .layer-item:hover {
+            border-color: #0d6efd;
+            background: #fff;
+        }
+        
+        .layer-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #0d6efd, #0056b3);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .compliance-badge {
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+        
+        .compliant {
+            background: #198754;
+        }
+        
+        .non-compliant {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-arrow-left me-2"></i>
+                TS 825 Hesaplayıcısı
+            </a>
+            <span class="navbar-text">
+                <i class="fas fa-thermometer-half me-2"></i>
+                Isı Geçirgenlik Hesabı
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <i class="fas fa-thermometer-half me-2"></i>
+                            Isı Geçirgenlik (U-Değeri) Hesaplayıcısı
+                        </h1>
+                        <p class="page-subtitle">
+                            TS 825:2024 standartlarına uygun yapı elemanı ısı geçirgenlik hesabı
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Input Section -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-layer-group me-2"></i>Yapı Elemanı Katmanları
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Element Type Selection -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Yapı Elemanı Türü</label>
+                                    <select class="form-select" id="elementType">
+                                        <option value="wall">Duvar</option>
+                                        <option value="roof">Çatı</option>
+                                        <option value="floor">Döşeme</option>
+                                        <option value="window">Pencere</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">İklim Bölgesi</label>
+                                    <select class="form-select" id="climateZone">
+                                        <option value="1">1. Bölge (En Soğuk)</option>
+                                        <option value="2">2. Bölge (Çok Soğuk)</option>
+                                        <option value="3" selected>3. Bölge (Soğuk)</option>
+                                        <option value="4">4. Bölge (Ilık)</option>
+                                        <option value="5">5. Bölge (Sıcak)</option>
+                                        <option value="6">6. Bölge (En Sıcak)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Layers -->
+                            <div id="layers-container">
+                                <!-- Layers will be added here -->
+                            </div>
+
+                            <!-- Add Layer Button -->
+                            <div class="text-center mb-3">
+                                <button type="button" class="btn btn-outline-primary" onclick="addLayer()">
+                                    <i class="fas fa-plus me-2"></i>Katman Ekle
+                                </button>
+                            </div>
+
+                            <!-- Calculate Button -->
+                            <div class="text-center">
+                                <button type="button" class="btn btn-primary btn-lg" onclick="calculateUValue()">
+                                    <i class="fas fa-calculator me-2"></i>Hesapla
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-line me-2"></i>Hesaplama Sonucu
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="calculation-result">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-calculator fa-3x mb-3"></i>
+                                    <p>Hesaplama yapmak için katmanları ekleyin ve "Hesapla" butonuna tıklayın.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Limit Values Info -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>TS 825 Limit Değerleri
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="limit-values-info">
+                                <small class="text-muted">Yapı elemanı türü ve iklim bölgesi seçin</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let layerCount = 0;
+        
+        // Malzeme veritabanı (örnek)
+        const materials = {
+            'concrete': { name: 'Beton', conductivity: 1.75 },
+            'brick': { name: 'Tuğla', conductivity: 0.70 },
+            'insulation_eps': { name: 'EPS Yalıtım', conductivity: 0.035 },
+            'insulation_xps': { name: 'XPS Yalıtım', conductivity: 0.030 },
+            'insulation_mw': { name: 'Mineral Yün', conductivity: 0.040 },
+            'plaster': { name: 'Sıva', conductivity: 0.87 },
+            'wood': { name: 'Ahşap', conductivity: 0.13 },
+            'steel': { name: 'Çelik', conductivity: 50.0 },
+            'glass': { name: 'Cam', conductivity: 1.0 }
+        };
+
+        // TS 825 limit değerleri
+        const limitValues = {
+            'wall': { 1: 0.57, 2: 0.48, 3: 0.40, 4: 0.34, 5: 0.29, 6: 0.25 },
+            'roof': { 1: 0.30, 2: 0.25, 3: 0.20, 4: 0.18, 5: 0.15, 6: 0.13 },
+            'floor': { 1: 0.58, 2: 0.48, 3: 0.40, 4: 0.34, 5: 0.29, 6: 0.25 },
+            'window': { 1: 2.40, 2: 2.00, 3: 1.80, 4: 1.60, 5: 1.40, 6: 1.20 }
+        };
+
+        function addLayer() {
+            layerCount++;
+            const container = document.getElementById('layers-container');
+            
+            const layerHtml = `
+                <div class="layer-item" id="layer-${layerCount}">
+                    <div class="layer-header">
+                        <h6 class="mb-0">Katman ${layerCount}</h6>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLayer(${layerCount})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Malzeme</label>
+                            <select class="form-select" onchange="updateConductivity(${layerCount}, this.value)">
+                                <option value="">Malzeme Seçin</option>
+                                ${Object.keys(materials).map(key => 
+                                    `<option value="${key}">${materials[key].name}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kalınlık (mm)</label>
+                            <input type="number" class="form-control" placeholder="Kalınlık" min="1">
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Isı İletkenlik (W/mK)</label>
+                            <input type="number" class="form-control conductivity-input" placeholder="λ değeri" step="0.001" min="0.001">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Isı Direnci (m²K/W)</label>
+                            <input type="text" class="form-control resistance-display" readonly placeholder="Otomatik hesaplanır">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', layerHtml);
+            updateLimitInfo();
+        }
+
+        function removeLayer(layerId) {
+            const layer = document.getElementById(`layer-${layerId}`);
+            if (layer) {
+                layer.remove();
+            }
+        }
+
+        function updateConductivity(layerId, materialKey) {
+            if (materialKey && materials[materialKey]) {
+                const layer = document.getElementById(`layer-${layerId}`);
+                const conductivityInput = layer.querySelector('.conductivity-input');
+                conductivityInput.value = materials[materialKey].conductivity;
+            }
+        }
+
+        function updateLimitInfo() {
+            const elementType = document.getElementById('elementType').value;
+            const climateZone = document.getElementById('climateZone').value;
+            const limitValue = limitValues[elementType][climateZone];
+            
+            document.getElementById('limit-values-info').innerHTML = `
+                <div class="text-center">
+                    <div class="h4 text-primary">${limitValue} W/m²K</div>
+                    <small class="text-muted">Maksimum izin verilen U değeri</small>
+                </div>
+            `;
+        }
+
+        function calculateUValue() {
+            const layers = document.querySelectorAll('.layer-item');
+            if (layers.length === 0) {
+                alert('Lütfen en az bir katman ekleyin');
+                return;
+            }
+
+            let totalResistance = 0.13 + 0.04; // Rsi + Rse
+            let layerDetails = [];
+            let hasError = false;
+
+            layers.forEach((layer, index) => {
+                const thickness = parseFloat(layer.querySelector('input[placeholder="Kalınlık"]').value);
+                const conductivity = parseFloat(layer.querySelector('.conductivity-input').value);
+                
+                if (!thickness || !conductivity || thickness <= 0 || conductivity <= 0) {
+                    hasError = true;
+                    return;
+                }
+
+                const resistance = (thickness / 1000) / conductivity; // mm'den m'ye çevir
+                totalResistance += resistance;
+                
+                layerDetails.push({
+                    layer: index + 1,
+                    thickness: thickness,
+                    conductivity: conductivity,
+                    resistance: resistance.toFixed(4)
+                });
+
+                // Resistance display'i güncelle
+                layer.querySelector('.resistance-display').value = resistance.toFixed(4);
+            });
+
+            if (hasError) {
+                alert('Lütfen tüm katmanlar için geçerli değerler girin');
+                return;
+            }
+
+            const uValue = 1 / totalResistance;
+            const elementType = document.getElementById('elementType').value;
+            const climateZone = document.getElementById('climateZone').value;
+            const limitValue = limitValues[elementType][climateZone];
+            const isCompliant = uValue <= limitValue;
+
+            displayResult(uValue, limitValue, isCompliant, totalResistance, layerDetails);
+        }
+
+        function displayResult(uValue, limitValue, isCompliant, totalResistance, layerDetails) {
+            const resultHtml = `
+                <div class="result-card">
+                    <div class="result-value">${uValue.toFixed(4)}</div>
+                    <div class="mb-3">W/m²K</div>
+                    <div class="compliance-badge ${isCompliant ? 'compliant' : 'non-compliant'}">
+                        <i class="fas ${isCompliant ? 'fa-check' : 'fa-times'} me-2"></i>
+                        ${isCompliant ? 'UYGUN' : 'UYGUN DEĞİL'}
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6>Detaylar:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Toplam Direnç:</strong> ${totalResistance.toFixed(4)} m²K/W</li>
+                        <li><strong>Limit Değer:</strong> ${limitValue} W/m²K</li>
+                        <li><strong>Fark:</strong> ${(limitValue - uValue).toFixed(4)} W/m²K</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('calculation-result').innerHTML = resultHtml;
+        }
+
+        // Event listeners
+        document.getElementById('elementType').addEventListener('change', updateLimitInfo);
+        document.getElementById('climateZone').addEventListener('change', updateLimitInfo);
+
+        // Initialize
+        addLayer(); // İlk katmanı ekle
+        addLayer(); // İkinci katmanı ekle
+        updateLimitInfo();
+    </script>
+</body>
+</html>

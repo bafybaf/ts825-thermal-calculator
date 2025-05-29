@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurulum - BONUS TS 825 Hesap Programı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .install-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem 0;
+        }
+        .install-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .install-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .install-step {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .install-step:last-child {
+            border-bottom: none;
+        }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .step-completed {
+            background: #28a745;
+        }
+        .step-error {
+            background: #dc3545;
+        }
+        .progress-container {
+            margin: 2rem 0;
+        }
+        .log-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="install-container">
+        <div class="container">
+            <div class="install-card">
+                <div class="install-header">
+                    <h1><i class="fas fa-cogs me-2"></i>TS 825 Kurulum</h1>
+                    <p class="mb-0">Veritabanı ve sistem kurulumu</p>
+                </div>
+
+                <div class="install-step">
+                    <div class="d-flex align-items-center">
+                        <div class="step-number" id="step1-icon">1</div>
+                        <div class="flex-grow-1">
+                            <h5>Veritabanı Bağlantısı Kontrolü</h5>
+                            <p class="mb-0 text-muted">Veritabanı ayarları kontrol ediliyor...</p>
+                        </div>
+                        <div id="step1-status">
+                            <i class="fas fa-spinner fa-spin text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="install-step">
+                    <div class="d-flex align-items-center">
+                        <div class="step-number" id="step2-icon">2</div>
+                        <div class="flex-grow-1">
+                            <h5>Veritabanı Oluşturma</h5>
+                            <p class="mb-0 text-muted">Veritabanı ve tablolar oluşturuluyor...</p>
+                        </div>
+                        <div id="step2-status">
+                            <i class="fas fa-clock text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="install-step">
+                    <div class="d-flex align-items-center">
+                        <div class="step-number" id="step3-icon">3</div>
+                        <div class="flex-grow-1">
+                            <h5>Demo Veriler</h5>
+                            <p class="mb-0 text-muted">Demo kullanıcılar ve veriler ekleniyor...</p>
+                        </div>
+                        <div id="step3-status">
+                            <i class="fas fa-clock text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="install-step">
+                    <div class="d-flex align-items-center">
+                        <div class="step-number" id="step4-icon">4</div>
+                        <div class="flex-grow-1">
+                            <h5>Kurulum Tamamlandı</h5>
+                            <p class="mb-0 text-muted">Sistem kullanıma hazır...</p>
+                        </div>
+                        <div id="step4-status">
+                            <i class="fas fa-clock text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-container px-4">
+                    <div class="progress">
+                        <div class="progress-bar" id="install-progress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="px-4 pb-4">
+                    <div class="log-container" id="install-log">
+                        <div class="text-muted">Kurulum başlatılıyor...</div>
+                    </div>
+                </div>
+
+                <div class="text-center p-4" id="install-actions">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cleanInstall">
+                            <label class="form-check-label" for="cleanInstall">
+                                Temiz kurulum (mevcut verileri sil)
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="startInstallation()">
+                        <i class="fas fa-play me-2"></i>Kurulumu Başlat
+                    </button>
+                    <button class="btn btn-warning btn-lg ms-2" onclick="cleanDatabase()" id="cleanBtn" style="display: none;">
+                        <i class="fas fa-trash me-2"></i>Veritabanını Temizle
+                    </button>
+                </div>
+
+                <div class="text-center p-4" id="install-complete" style="display: none;">
+                    <div class="alert alert-success">
+                        <h4><i class="fas fa-check-circle me-2"></i>Kurulum Tamamlandı!</h4>
+                        <p class="mb-3">TS 825 Hesap Programı başarıyla kuruldu.</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Demo Hesaplar:</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Admin:</strong> admin / admin123</li>
+                                    <li><strong>Kullanıcı:</strong> demo / demo123</li>
+                                    <li><strong>Mimar:</strong> mimar1 / mimar123</li>
+                                    <li><strong>Mühendis:</strong> muhendis1 / muhendis123</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Özellikler:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Kullanıcı sistemi</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Proje yönetimi</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Hesaplama modülleri</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Raporlama sistemi</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="login.html" class="btn btn-success btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Giriş Sayfasına Git
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 0;
+        const totalSteps = 4;
+
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('install-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = {
+                'info': 'text-info',
+                'success': 'text-success',
+                'error': 'text-danger',
+                'warning': 'text-warning'
+            }[type] || 'text-muted';
+
+            logContainer.innerHTML += `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateStep(step, status) {
+            const icon = document.getElementById(`step${step}-icon`);
+            const statusEl = document.getElementById(`step${step}-status`);
+
+            if (status === 'success') {
+                icon.classList.add('step-completed');
+                statusEl.innerHTML = '<i class="fas fa-check text-success"></i>';
+            } else if (status === 'error') {
+                icon.classList.add('step-error');
+                statusEl.innerHTML = '<i class="fas fa-times text-danger"></i>';
+            } else if (status === 'loading') {
+                statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-primary"></i>';
+            }
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('install-progress').style.width = percentage + '%';
+        }
+
+        async function cleanDatabase() {
+            if (!confirm('Tüm veritabanı verileri silinecek! Bu işlem geri alınamaz. Devam etmek istiyor musunuz?')) {
+                return;
+            }
+
+            log('Veritabanı temizleniyor...', 'warning');
+
+            try {
+                const response = await fetch('api/install.php?action=clean', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    log('Veritabanı temizlendi', 'success');
+                    document.getElementById('cleanBtn').style.display = 'none';
+                    // Kurulum adımlarını sıfırla
+                    for (let i = 1; i <= 4; i++) {
+                        document.getElementById(`step${i}-icon`).classList.remove('step-completed', 'step-error');
+                        document.getElementById(`step${i}-status`).innerHTML = '<i class="fas fa-clock text-muted"></i>';
+                    }
+                    updateProgress(0);
+                } else {
+                    log('Temizleme hatası: ' + result.error, 'error');
+                }
+            } catch (error) {
+                log('Temizleme hatası: ' + error.message, 'error');
+            }
+        }
+
+        async function startInstallation() {
+            document.getElementById('install-actions').style.display = 'none';
+            log('Kurulum başlatıldı...', 'info');
+
+            const cleanInstall = document.getElementById('cleanInstall').checked;
+
+            try {
+                // Step 1: Check database connection
+                currentStep = 1;
+                updateStep(1, 'loading');
+                updateProgress(25);
+                log('Veritabanı bağlantısı kontrol ediliyor...', 'info');
+
+                const checkResponse = await fetch('api/install.php?action=check');
+                const checkResult = await checkResponse.json();
+
+                if (checkResult.success) {
+                    updateStep(1, 'success');
+                    log('Veritabanı bağlantısı başarılı', 'success');
+                } else {
+                    updateStep(1, 'error');
+                    log('Veritabanı bağlantı hatası: ' + checkResult.error, 'error');
+                    return;
+                }
+
+                // Step 2: Install database
+                currentStep = 2;
+                updateStep(2, 'loading');
+                updateProgress(50);
+                log('Veritabanı kurulumu başlatılıyor...', 'info');
+
+                const installResponse = await fetch('api/install.php?action=install', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        include_demo_data: true,
+                        clean_install: cleanInstall
+                    })
+                });
+
+                const installResult = await installResponse.json();
+
+                if (installResult.success) {
+                    updateStep(2, 'success');
+                    log('Veritabanı başarıyla kuruldu', 'success');
+
+                    // Detaylı mesajları göster
+                    if (installResult.details) {
+                        installResult.details.forEach(detail => {
+                            log('✓ ' + detail, 'success');
+                        });
+                    }
+
+                    // Step 3: Demo data
+                    currentStep = 3;
+                    updateStep(3, 'success');
+                    updateProgress(75);
+                    log('Demo veriler eklendi', 'success');
+
+                    // Step 4: Complete
+                    currentStep = 4;
+                    updateStep(4, 'success');
+                    updateProgress(100);
+                    log('Kurulum tamamlandı!', 'success');
+
+                    // Show completion
+                    setTimeout(() => {
+                        document.getElementById('install-complete').style.display = 'block';
+                    }, 1000);
+
+                } else {
+                    updateStep(2, 'error');
+                    log('Kurulum hatası: ' + installResult.error, 'error');
+
+                    // Hata türüne göre özel mesajlar göster
+                    if (installResult.error.includes('Duplicate entry') || installResult.error.includes('1062')) {
+                        log('Bu hata genellikle daha önce kurulum yapıldığını gösterir.', 'warning');
+                        log('Veritabanını temizleyip tekrar deneyin veya mevcut kurulumu kullanın.', 'info');
+
+                        // Temizleme butonunu göster
+                        document.getElementById('install-actions').style.display = 'block';
+                        document.getElementById('cleanBtn').style.display = 'inline-block';
+                    } else if (installResult.error.includes('Column not found') || installResult.error.includes('1054')) {
+                        log('Veritabanı şeması eski. Temizleyip yeniden kurun.', 'warning');
+                        log('Bu genellikle eski bir kurulumdan kalan tablolar nedeniyle olur.', 'info');
+
+                        // Temizleme butonunu göster
+                        document.getElementById('install-actions').style.display = 'block';
+                        document.getElementById('cleanBtn').style.display = 'inline-block';
+                    } else if (installResult.error.includes('Illegal mix of collations') || installResult.error.includes('1267')) {
+                        log('Karakter seti (collation) uyumsuzluğu. Veritabanını temizleyip yeniden kurun.', 'warning');
+                        log('Bu MySQL veritabanında farklı karakter setlerinin karışması nedeniyle olur.', 'info');
+                        log('Temizleme işlemi bu sorunu çözecektir.', 'info');
+
+                        // Temizleme butonunu göster
+                        document.getElementById('install-actions').style.display = 'block';
+                        document.getElementById('cleanBtn').style.display = 'inline-block';
+                    } else {
+                        log('Genel kurulum hatası. Veritabanı ayarlarını kontrol edin.', 'warning');
+
+                        // Temizleme butonunu göster
+                        document.getElementById('install-actions').style.display = 'block';
+                        document.getElementById('cleanBtn').style.display = 'inline-block';
+                    }
+                }
+
+            } catch (error) {
+                log('Kurulum sırasında hata oluştu: ' + error.message, 'error');
+                updateStep(currentStep, 'error');
+            }
+        }
+
+        // Auto-start installation if requested
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('auto') === 'true') {
+            window.addEventListener('load', () => {
+                setTimeout(startInstallation, 1000);
+            });
+        }
+    </script>
+</body>
+</html>

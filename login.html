@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş - BONUS TS 825 Hesap Programı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .auth-body {
+            padding: 2rem;
+        }
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+        .btn-auth {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <div class="auth-header">
+                    <h2><i class="fas fa-calculator me-2"></i>TS 825</h2>
+                    <p class="mb-0">Hesap Programına Giriş</p>
+                </div>
+                <div class="auth-body">
+                    <form id="loginForm">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="loginUsername" name="username" placeholder="Kullanıcı Adı" required>
+                            <label for="loginUsername">Kullanıcı Adı veya Email</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Şifre" required>
+                            <label for="loginPassword">Şifre</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Beni Hatırla
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-auth btn-primary w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                        </button>
+                    </form>
+                    <div class="auth-switch">
+                        <p class="mb-0">Hesabınız yok mu? 
+                            <a href="#" onclick="showRegisterForm()" class="text-decoration-none">Kayıt Ol</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form" style="display: none;">
+                <div class="auth-header">
+                    <h2><i class="fas fa-user-plus me-2"></i>Kayıt Ol</h2>
+                    <p class="mb-0">Yeni Hesap Oluştur</p>
+                </div>
+                <div class="auth-body">
+                    <form id="registerForm">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="registerFullName" name="full_name" placeholder="Ad Soyad" required>
+                            <label for="registerFullName">Ad Soyad</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="registerUsername" name="username" placeholder="Kullanıcı Adı" required>
+                            <label for="registerUsername">Kullanıcı Adı</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="email" class="form-control" id="registerEmail" name="email" placeholder="Email" required>
+                            <label for="registerEmail">Email Adresi</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="registerPassword" name="password" placeholder="Şifre" required minlength="6">
+                            <label for="registerPassword">Şifre (En az 6 karakter)</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Şifre Tekrar" required>
+                            <label for="confirmPassword">Şifre Tekrar</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                            <label class="form-check-label" for="acceptTerms">
+                                <a href="#" class="text-decoration-none">Kullanım şartlarını</a> kabul ediyorum
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-auth btn-success w-100">
+                            <i class="fas fa-user-plus me-2"></i>Kayıt Ol
+                        </button>
+                    </form>
+                    <div class="auth-switch">
+                        <p class="mb-0">Zaten hesabınız var mı? 
+                            <a href="#" onclick="showLoginForm()" class="text-decoration-none">Giriş Yap</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form switching
+        function showLoginForm() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+        }
+
+        function showRegisterForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+        }
+
+        // Loading overlay
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const iconMap = {
+                'success': 'fa-check-circle text-success',
+                'error': 'fa-exclamation-circle text-danger',
+                'warning': 'fa-exclamation-triangle text-warning',
+                'info': 'fa-info-circle text-info'
+            };
+            
+            const toastHtml = `
+                <div class="toast" id="${toastId}" role="alert">
+                    <div class="toast-header">
+                        <i class="fas ${iconMap[type]} me-2"></i>
+                        <strong class="me-auto">TS 825</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toast = new bootstrap.Toast(document.getElementById(toastId));
+            toast.show();
+            
+            document.getElementById(toastId).addEventListener('hidden.bs.toast', () => {
+                document.getElementById(toastId).remove();
+            });
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('api/auth.php?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Session token'ı sakla
+                    localStorage.setItem('session_token', result.session_token);
+                    localStorage.setItem('user_data', JSON.stringify(result.user));
+                    
+                    showToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showToast(result.error || 'Giriş başarısız', 'error');
+                }
+            } catch (error) {
+                console.error('Giriş hatası:', error);
+                showToast('Bağlantı hatası', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Şifre kontrolü
+            if (data.password !== document.getElementById('confirmPassword').value) {
+                showToast('Şifreler eşleşmiyor', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('api/auth.php?action=register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
+                    showLoginForm();
+                    document.getElementById('registerForm').reset();
+                } else {
+                    showToast(result.error || 'Kayıt başarısız', 'error');
+                }
+            } catch (error) {
+                console.error('Kayıt hatası:', error);
+                showToast('Bağlantı hatası', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Sayfa yüklendiğinde session kontrolü
+        window.addEventListener('load', () => {
+            const sessionToken = localStorage.getItem('session_token');
+            if (sessionToken) {
+                // Session geçerliliğini kontrol et
+                fetch('api/auth.php?action=validate', {
+                    headers: {
+                        'Authorization': sessionToken
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        // Zaten giriş yapmış, ana sayfaya yönlendir
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => {
+                    console.log('Session kontrolü başarısız:', error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
